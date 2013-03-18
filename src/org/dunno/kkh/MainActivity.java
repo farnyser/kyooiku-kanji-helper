@@ -1,15 +1,22 @@
 package org.dunno.kkh;
 
+import org.dunno.kkh.models.KanjiSet;
+import org.dunno.kkh.utils.ReadCSV;
+
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 
 public class MainActivity extends Activity {
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		if ( savedInstanceState == null ) {
+			KanjiSet ks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
+		}
 	}
 
 	@Override
