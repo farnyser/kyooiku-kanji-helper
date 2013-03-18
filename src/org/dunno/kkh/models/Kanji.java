@@ -43,4 +43,8 @@ public class Kanji {
 	public String getKunReading() {
 		return kunReading;
 	}
+	
+	public String toString() {
+		return "{"+grade+","+number+","+character+","+meaning+","+onReading+","+kunReading+"}";
+	}
 }
