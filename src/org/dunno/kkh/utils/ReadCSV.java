@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
@@ -20,12 +21,20 @@ public class ReadCSV {
 		int grades[] = {80, 240, 440, 640, 640+185, 640+185+181};
 		
 		for ( String line : lines ) {
+			line = line.replaceAll("\"([^\"]*),([^\"]*),([^\"]*)\"", "$1 or $2 or $3");
+			line = line.replaceAll("\"([^\"]*),([^\"]*)\"", "$1 or $2");
+			
 			String item[] = line.split(",");
 			int number = Integer.parseInt(item[0]);
 			if ( number > grades[grade] )
 				grade++;
 			
-			result.addKanji(new Kanji(number, grade, item[1], item[2], item[3], item[4]));
+			if ( item.length == 6 )
+				result.addKanji(new Kanji(number, grade, item[1], item[3], item[4], item[5]));
+			else if ( item.length == 5 )
+				result.addKanji(new Kanji(number, grade, item[1], item[3], item[4], ""));
+			else
+				Log.w("ReadCSV", "Unexptected item : " + Arrays.toString(item));
 		}
 		
 		return result;
