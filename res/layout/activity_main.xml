@@ -5,13 +5,16 @@
     android:orientation="vertical"
     tools:context=".MainActivity" >
 
-    <GridLayout
+    <GridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
         android:layout_height="350dp"
-        android:layout_gravity="fill_vertical|fill_horizontal" >
-
-    </GridLayout>
+        android:gravity="center"
+        android:horizontalSpacing="10dp"
+        android:numColumns="auto_fit"
+        android:padding="10dp"
+        android:stretchMode="columnWidth"
+        android:verticalSpacing="10dp" />
 
     <TextView
         android:id="@+id/textView"
