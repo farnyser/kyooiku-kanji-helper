@@ -10,11 +10,16 @@ import org.dunno.kkh.pickers.PickerInterface.QuizzCouple;
 import org.dunno.kkh.pickers.RandomPicker;
 import org.dunno.kkh.utils.FIlter;
 import org.dunno.kkh.utils.ReadCSV;
+import org.dunno.kkh.settings.SettingsActivity;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -23,25 +28,38 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
+	public static final int SETTINGS_REQUEST = 1;
 	
 	static ObjectAdapter adapter;
 	Kanji answer;
-	KanjiSet ks, choices;
+	KanjiSet fullks, ks, choices;
 	PickerInterface picker;
 	QuizzCouple qc;
 
+	int start, end;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 		
-        
-		if ( adapter == null ) {
+		if ( adapter == null ) {			
 			adapter = new ObjectAdapter();
 			((GridView) findViewById(R.id.gridView)).setAdapter(adapter);
-			ks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
-			ks = FIlter.getNFirst(ks, 140);
+			fullks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
+			ks = FIlter.getRange(fullks, start, end);
 			picker = new RandomPicker();
+		}
+    
+		if ( 
+			start != Integer.parseInt(sharedPreferences.getString("pref_start", "0"))
+			|| end != Integer.parseInt(sharedPreferences.getString("pref_end", "10"))
+		) {
+			start = Integer.parseInt(sharedPreferences.getString("pref_start", "0"));
+			end = Integer.parseInt(sharedPreferences.getString("pref_end", "10"));
+			ks = FIlter.getRange(fullks, start, end);
+			newChoice();
 		}
 		
 		if ( savedInstanceState == null ) {
@@ -63,6 +81,23 @@ public class MainActivity extends Activity {
 					
 				}
 			});
+		}
+	}
+	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if ( hasFocus ) {
+			SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+			if ( 
+					start != Integer.parseInt(sharedPreferences.getString("pref_start", "0"))
+					|| end != Integer.parseInt(sharedPreferences.getString("pref_end", "10"))
+				) {
+					start = Integer.parseInt(sharedPreferences.getString("pref_start", "0"));
+					end = Integer.parseInt(sharedPreferences.getString("pref_end", "10"));
+					ks = FIlter.getRange(fullks, start, end);
+					newChoice();
+				}
 		}
 	}
 
@@ -120,6 +155,18 @@ public class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_settings:
+			Intent showSettings = new Intent(MainActivity.this, SettingsActivity.class);
+			MainActivity.this.startActivityForResult(showSettings, SETTINGS_REQUEST);
+			return true;
+		}
+		
+		return false;
 	}
 
 }

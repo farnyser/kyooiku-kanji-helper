@@ -3,7 +3,7 @@ package org.dunno.kkh.utils;
 import org.dunno.kkh.models.KanjiSet;
 
 public class FIlter {
-	static KanjiSet getRange(KanjiSet ks, int start, int end) {
+	public static KanjiSet getRange(KanjiSet ks, int start, int end) {
 		KanjiSet result = new KanjiSet();
 		
 		for ( int i = start ; i < end ; i++ ) {

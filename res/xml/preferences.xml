@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+	<EditTextPreference
+	    android:key="pref_start"
+	    android:title="Start Kanji's number"
+	    android:summary="Index of the list's first Kanji"
+	    android:numeric="integer"
+	    android:maxLength="4" />
+	<EditTextPreference
+	    android:key="pref_end"
+	    android:title="End Kanji's number"
+	    android:summary="Index of the list's last Kanji"
+	    android:numeric="integer"
+	    android:maxLength="4" />
+</PreferenceScreen>
