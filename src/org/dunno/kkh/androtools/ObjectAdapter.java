@@ -3,6 +3,8 @@ package org.dunno.kkh.androtools;
 import java.util.Collection;
 import java.util.Vector;
 
+import org.dunno.kkh.models.Kanji;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,12 +12,18 @@ import android.widget.TextView;
 
 public class ObjectAdapter extends BaseAdapter {
 	private Vector<String> items = new Vector<String>();
+	private Vector<Kanji> kanjis = new Vector<Kanji>();
 	
-    public void updateContent(Collection<String> items) {
+    public void updateContent(Collection<Kanji> kanjis, Collection<String> items) {
         this.items.clear();
+        this.kanjis.clear();
     
         for ( String s : items ) {
         	this.items.add(s);
+        }
+    
+        for ( Kanji k : kanjis ) {
+        	this.kanjis.add(k);
         }
     
         this.notifyDataSetChanged();
@@ -28,8 +36,8 @@ public class ObjectAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public String getItem(int location) {
-		return items.get(location);
+	public Kanji getItem(int location) {
+		return kanjis.get(location);
 	}
 
 	@Override
