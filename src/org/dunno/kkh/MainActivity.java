@@ -14,6 +14,7 @@ import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
 import org.dunno.kkh.models.Stats;
 import org.dunno.kkh.pickers.PickerInterface;
+import org.dunno.kkh.pickers.SmartPicker;
 import org.dunno.kkh.pickers.PickerInterface.QuizzCouple;
 import org.dunno.kkh.pickers.RandomPicker;
 import org.dunno.kkh.settings.SettingsActivity;
@@ -60,8 +61,9 @@ public class MainActivity extends Activity {
 			((GridView) findViewById(R.id.gridView)).setAdapter(adapter);
 			fullks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
 			ks = FIlter.getRange(fullks, start, end);
-			picker = new RandomPicker();
+			//picker = new RandomPicker();
 			stats = new Stats(read("stats.csv"));
+			picker = new SmartPicker(stats);
 		}
 
 		if (start != Integer.parseInt(sharedPreferences.getString("pref_start",
