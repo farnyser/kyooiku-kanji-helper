@@ -7,16 +7,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import org.dunno.kkh.androtools.ObjectAdapter;
 import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
 import org.dunno.kkh.models.Stats;
 import org.dunno.kkh.pickers.PickerInterface;
-import org.dunno.kkh.pickers.SmartPicker;
 import org.dunno.kkh.pickers.PickerInterface.QuizzCouple;
-import org.dunno.kkh.pickers.RandomPicker;
+import org.dunno.kkh.pickers.SmartPicker;
 import org.dunno.kkh.settings.SettingsActivity;
 import org.dunno.kkh.utils.FIlter;
 import org.dunno.kkh.utils.ReadCSV;
@@ -35,7 +33,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	public static final int SETTINGS_REQUEST = 1;
@@ -62,7 +59,15 @@ public class MainActivity extends Activity {
 			fullks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
 			ks = FIlter.getRange(fullks, start, end);
 			//picker = new RandomPicker();
-			stats = new Stats(read("stats.csv"));
+			
+			try {
+				stats = new Stats(read("stats.csv"));
+			}
+			catch ( Exception e ) {
+				Log.e("Stats", "CSV read failed", e);
+				stats = new Stats();
+			}
+			
 			picker = new SmartPicker(stats);
 		}
 
@@ -91,13 +96,9 @@ public class MainActivity extends Activity {
 
 					if (choosen.equals(answer)) {
 						stats.addSuccess(qc, answer);
-						Toast.makeText(getApplicationContext(), "OK !",
-								Toast.LENGTH_SHORT).show();
 						newChoice();
 					} else {
 						stats.addError(qc, answer, choosen);
-						Toast.makeText(getApplicationContext(), "WRONG !",
-								Toast.LENGTH_SHORT).show();
 					}
 					
 					write("stats.csv", stats.toString());

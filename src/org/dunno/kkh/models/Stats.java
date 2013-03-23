@@ -1,5 +1,6 @@
 package org.dunno.kkh.models;
 
+import android.annotation.SuppressLint;
 import java.util.HashMap;
 
 import org.dunno.kkh.pickers.PickerInterface.QuizzCouple;
@@ -16,6 +17,7 @@ public class Stats {
 		}
 	}
 
+	@SuppressLint("UseSparseArrays")
 	public HashMap<Integer, StatItem> stats = new HashMap<Integer, StatItem>();
 
 	private void init(int n) {
@@ -133,7 +135,7 @@ public class Stats {
 			result += si.secondHandError.get(QuizzCouple.READINGS_TO_KANJI)
 					+ ", ";
 			result += si.secondHandError.get(QuizzCouple.MEANINGS_TO_KANJI)
-					+ "\n ";
+					+ " eol\n";
 		}
 
 		return result;
@@ -143,7 +145,7 @@ public class Stats {
 		if (csv == null)
 			return;
 
-		final String[] lines = csv.split("\n");
+		final String[] lines = csv.split("eol");
 
 		for (String line : lines) {
 			String items[] = line.replace(" ", "").split(",");

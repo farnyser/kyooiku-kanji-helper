@@ -9,22 +9,20 @@ import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
 import org.dunno.kkh.models.Stats;
 
-// TODO put scores in cache
+import android.util.Log;
+
 public class SmartPicker implements PickerInterface {
 	private Stats stats;
 	private Random random = new Random();
 
-	private class SK implements Comparable {
+	private class SK implements Comparable<SK> {
 		public Kanji kanji;
 		public Double score;
 		public Integer age;
 		
 		@Override
-		public int compareTo(Object other) {
-			if ( other instanceof SK )
-				return score.compareTo(((SK)other).score);
-			else
-				return 0;
+		public int compareTo(SK other) {
+			return score.compareTo(((SK)other).score);
 		}
 	}
 	
@@ -37,27 +35,7 @@ public class SmartPicker implements PickerInterface {
 
 	@Override
 	public Kanji pickKanji(KanjiSet ks) {
-		ArrayList<SK> sks = new ArrayList<SK>();
-		Double sumScore = 0.0;
-		
-		for ( Kanji k : ks.getAll() ) {
-			SK sk = new SK();
-			sk.kanji = k;
-			sk.score = computeScore(ks, k);
-			sumScore += sk.score;
-			sks.add(sk);
-		}
-
-		Collections.sort(sks);
-		Double selected = (double)random.nextInt((int) Math.floor(sumScore));
-		
-		for ( SK sk : sks ) {
-			selected -= sk.score;
-			if ( selected <= 0 ) 
-				return sk.kanji;
-		}
-		
-		return sks.get(0).kanji;
+		return pickKanji(ks, null, null);
 	}
 
 	@Override
@@ -81,8 +59,10 @@ public class SmartPicker implements PickerInterface {
 			}
 			
 			while ( true ) {
-				Kanji tmp = pickKanji(ks);
-				if ( tmp.equals(k) == false && result.getAll().contains(tmp) == false ) { 
+				Kanji tmp = pickKanji(ks, k, result);
+				if ( tmp == null )
+					break;
+				else if ( tmp.equals(k) == false && result.getAll().contains(tmp) == false ) { 
 					result.addKanji(tmp);
 					break;
 				}
@@ -105,6 +85,7 @@ public class SmartPicker implements PickerInterface {
 	@Override
 	public QuizzCouple pickQuizzCouple(KanjiSet ks, Kanji k) {
 		// TODO smarter QuizzCouple select
+		
 		
 		switch ( random.nextInt(4) ) {
 		case 0:
@@ -189,6 +170,50 @@ public class SmartPicker implements PickerInterface {
 		sk.score = score;
 		cache.put(kanji, sk);
 		
+		// reuse kanji, even if we are good
+		// if we don't show them anymore, it can be forgotten
+		if ( score < .01 ) 
+			score = .01;
+		
 		return score;
+	}
+	
+	/**
+	 * Pick a Kanji in ks list but not notItem and not one of the element of notList
+	 * @param ks			List to choose from
+	 * @param notItem		Kanji to eliminate
+	 * @param notList		List of Kanji to eliminate
+	 * @return a kanji, or null
+	 */
+	private Kanji pickKanji(KanjiSet ks, Kanji notItem, KanjiSet notList) {
+		ArrayList<SK> sks = new ArrayList<SK>();
+		Double sumScore = 0.0;
+		
+		for ( Kanji k : ks.getAll() ) {
+			if ( notItem != null && k.equals(notItem) ) 
+				continue;
+			else if ( notList != null && notList.getAll().contains(k) )
+				continue;
+			
+			SK sk = new SK();
+			sk.kanji = k;
+			sk.score = computeScore(ks, k);
+			sumScore += sk.score;
+			sks.add(sk);
+		}
+
+		Collections.shuffle(sks);
+		Double selected =  random.nextDouble()*sumScore;
+		
+		for ( SK sk : sks ) {
+			selected -= sk.score;
+			if ( selected <= 0 ) 
+				return sk.kanji;
+		}
+		
+		if ( sks.size() > 0 )
+			return sks.get(0).kanji;
+		else
+			return null;
 	}
 }
