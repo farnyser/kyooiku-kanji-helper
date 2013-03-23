@@ -33,4 +33,23 @@ public class RandomPicker implements PickerInterface {
 		
 		return result;
 	}
+
+	@Override
+	public QuizzCouple pickQuizzCouple(KanjiSet ks, Kanji k) {
+		switch ( random.nextInt(4) ) {
+			case 0:
+				return PickerInterface.QuizzCouple.KANJI_TO_MEANINGS;
+			case 1:
+				return PickerInterface.QuizzCouple.KANJI_TO_MEANINGS;
+			case 2:
+				return PickerInterface.QuizzCouple.MEANINGS_TO_KANJI;
+			case 3:
+				return PickerInterface.QuizzCouple.READINGS_TO_KANJI;
+		}
+		
+		// should never get there
+		return PickerInterface.QuizzCouple.READINGS_TO_KANJI;
+	}
+	
+	
 }
