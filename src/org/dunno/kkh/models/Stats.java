@@ -72,6 +72,18 @@ public class Stats {
 		return 0;
 	}
 	
+	public Integer getFirstHandSuccess(Kanji k, QuizzCouple qc) {
+		StatItem si = stats.get(k.getNumber());
+		
+		if ( si != null ) {			
+			if ( si.firstHandSuccess.get(qc) != null ) {
+				return si.firstHandSuccess.get(qc);
+			}
+		}
+		
+		return 0;
+	}
+	
 	public Integer getFirstHandError(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
 		
@@ -88,6 +100,18 @@ public class Stats {
 		return 0;
 	}
 	
+	public Integer getFirstHandError(Kanji k, QuizzCouple qc) {
+		StatItem si = stats.get(k.getNumber());
+		
+		if ( si != null ) {			
+			if ( si.firstHandError.get(qc) != null ) {
+				return si.firstHandError.get(qc);
+			}
+		}
+		
+		return 0;
+	}
+
 	public Integer getSecondHandError(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
 		
@@ -104,6 +128,18 @@ public class Stats {
 		return 0;
 	}
 	
+	public Integer getSecondHandError(Kanji k, QuizzCouple qc) {
+		StatItem si = stats.get(k.getNumber());
+		
+		if ( si != null ) {			
+			if ( si.secondHandError.get(qc) != null ) {
+				return si.secondHandError.get(qc);
+			}
+		}
+		
+		return 0;
+	}
+
 	public String toString() {
 		String result = "";
 

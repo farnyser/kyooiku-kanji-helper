@@ -26,7 +26,12 @@ public class SmartPicker implements PickerInterface {
 		}
 	}
 	
-	private final int MAX_AGE = 2;
+	private final int MAX_AGE = 1;
+	private final double C_1HE = 0.65;
+	private final double C_2HE = 1.00 - C_1HE;
+	private final double C_USE = 0.30;
+	private final double C_SR = 0.30;
+	
 	private HashMap<Kanji, SK> cache = new HashMap<Kanji, SK>();
 	
 	public SmartPicker(Stats stats) {
@@ -84,22 +89,40 @@ public class SmartPicker implements PickerInterface {
 
 	@Override
 	public QuizzCouple pickQuizzCouple(KanjiSet ks, Kanji k) {
-		// TODO smarter QuizzCouple select
+		PickerInterface.QuizzCouple qcs[] = {
+				PickerInterface.QuizzCouple.KANJI_TO_MEANINGS,
+				PickerInterface.QuizzCouple.KANJI_TO_MEANINGS,
+				PickerInterface.QuizzCouple.MEANINGS_TO_KANJI,
+				PickerInterface.QuizzCouple.READINGS_TO_KANJI };
+		double errorRate[] = {0,0,0,0};
+		double sumErrorRate = 0;
 		
+		for ( int i = 0 ; i < 4 ; i++ ) {
+			QuizzCouple qc = qcs[i];
+			
+			int fhs = stats.getFirstHandSuccess(k, qc);
+			int fhe = stats.getFirstHandError(k, qc);
+			int she = stats.getSecondHandError(k, qc);
+			errorRate[i] = fhs > 0 ? 0 : 1;
 		
-		switch ( random.nextInt(4) ) {
-		case 0:
-			return PickerInterface.QuizzCouple.KANJI_TO_MEANINGS;
-		case 1:
-			return PickerInterface.QuizzCouple.KANJI_TO_MEANINGS;
-		case 2:
-			return PickerInterface.QuizzCouple.MEANINGS_TO_KANJI;
-		case 3:
-			return PickerInterface.QuizzCouple.READINGS_TO_KANJI;
+			if ( she != 0 || fhe != 0 )
+				errorRate[i] = fhs / (C_1HE*fhe + C_2HE*she); 
+			
+			sumErrorRate += errorRate[i];
 		}
-	
-		// should never get there
-		return PickerInterface.QuizzCouple.READINGS_TO_KANJI;
+		
+		double d = random.nextDouble() * sumErrorRate;
+		
+		for ( int i = 0 ; i < 4 ; i++ ) {
+			if ( d < errorRate[i] )
+				return qcs[i];
+			
+			d -= errorRate[i];
+		}
+		
+		
+		// should not reach here unless there ain't any error
+		return qcs[ random.nextInt(4) ];
 	}
 	
 	/**
@@ -116,10 +139,6 @@ public class SmartPicker implements PickerInterface {
 		if ( cache.get(kanji) != null && cache.get(kanji).age < MAX_AGE ) 
 			return cache.get(kanji).score;
 		
-		final double C_1HE = 0.65;
-		final double C_2HE = 1.00 - C_1HE;
-		final double C_USE = 0.30;
-		final double C_SR = 0.30;
 		
 		int sum1HE = 0;
 		int sum1HS = 0;
