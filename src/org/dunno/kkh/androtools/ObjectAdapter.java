@@ -5,6 +5,7 @@ import java.util.Vector;
 
 import org.dunno.kkh.models.Kanji;
 
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -52,6 +53,7 @@ public class ObjectAdapter extends BaseAdapter {
 		text.setTextSize((float) (text.getTextSize()*1.5));
 		text.setHeight(100);
 		text.setWidth(100);
+		text.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 		return text;
 	}
 }

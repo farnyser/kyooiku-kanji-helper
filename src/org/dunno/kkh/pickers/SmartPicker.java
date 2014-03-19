@@ -9,8 +9,6 @@ import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
 import org.dunno.kkh.models.Stats;
 
-import android.util.Log;
-
 public class SmartPicker implements PickerInterface {
 	private Stats stats;
 	private Random random = new Random();
