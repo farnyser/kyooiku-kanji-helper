@@ -6,7 +6,13 @@ public class FIlter {
 	public static KanjiSet getRange(KanjiSet ks, int start, int end) {
 		KanjiSet result = new KanjiSet();
 		
+		// normal case
 		for ( int i = start ; i < end ; i++ ) {
+			result.addKanji(ks.getByIndex(i));
+		}
+		
+		// reversed start/end
+		for ( int i = end ; i < start ; i++ ) {
 			result.addKanji(ks.getByIndex(i));
 		}
 		

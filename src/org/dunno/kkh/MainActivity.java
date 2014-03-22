@@ -38,6 +38,7 @@ public class MainActivity extends Activity {
 	public static final int SETTINGS_REQUEST = 1;
 
 	static ObjectAdapter adapter;
+		
 	Kanji answer;
 	KanjiSet fullks, ks, choices;
 	PickerInterface picker;
@@ -52,13 +53,18 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
-
+		
 		if (adapter == null) {
+			Log.v("MainActivity", "create adapter");
+			
 			adapter = new ObjectAdapter();
+			
 			((GridView) findViewById(R.id.gridView)).setAdapter(adapter);
 			fullks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
 			ks = FIlter.getRange(fullks, start, end);
 			//picker = new RandomPicker();
+			
+			sharedPreferences.edit().putInt("size", fullks.getAll().size()).commit();
 			
 			try {
 				stats = new Stats(read("stats.csv"));
@@ -71,14 +77,12 @@ public class MainActivity extends Activity {
 			picker = new SmartPicker(stats);
 		}
 
-		if (start != Integer.parseInt(sharedPreferences.getString("pref_start",
-				"0"))
-				|| end != Integer.parseInt(sharedPreferences.getString(
-						"pref_end", "10"))) {
-			start = Integer.parseInt(sharedPreferences.getString("pref_start",
-					"0"));
-			end = Integer.parseInt(sharedPreferences
-					.getString("pref_end", "10"));
+		if (start != sharedPreferences.getInt("pref_start",
+				0)
+				|| end != sharedPreferences.getInt(
+						"pref_end", 10)) {
+			start = sharedPreferences.getInt("pref_start", 0);
+			end = sharedPreferences.getInt("pref_end", 10);
 			ks = FIlter.getRange(fullks, start, end);
 			newChoice();
 		}
@@ -113,14 +117,14 @@ public class MainActivity extends Activity {
 		if (hasFocus) {
 			SharedPreferences sharedPreferences = PreferenceManager
 					.getDefaultSharedPreferences(getApplicationContext());
-			if (start != Integer.parseInt(sharedPreferences.getString(
-					"pref_start", "0"))
-					|| end != Integer.parseInt(sharedPreferences.getString(
-							"pref_end", "10"))) {
-				start = Integer.parseInt(sharedPreferences.getString(
-						"pref_start", "0"));
-				end = Integer.parseInt(sharedPreferences.getString("pref_end",
-						"10"));
+			if (start != sharedPreferences.getInt(
+					"pref_start", 0)
+					|| end != sharedPreferences.getInt(
+							"pref_end", 10)) {
+				start = sharedPreferences.getInt(
+						"pref_start", 0);
+				end = sharedPreferences.getInt("pref_end",
+						10);
 				ks = FIlter.getRange(fullks, start, end);
 				newChoice();
 			}
