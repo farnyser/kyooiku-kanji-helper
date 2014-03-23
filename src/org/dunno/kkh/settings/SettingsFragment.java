@@ -3,19 +3,12 @@ package org.dunno.kkh.settings;
 import org.dunno.kkh.R;
 
 //import android.preference.SeekBarPreference;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.SeekBar;
+import android.widget.Toast;
 
 public class SettingsFragment extends PreferenceFragment {
 	
@@ -40,12 +33,15 @@ public class SettingsFragment extends PreferenceFragment {
 				Integer start = (Integer) newValue;
 				Integer end = getPreferenceManager().getSharedPreferences().getInt("pref_end", start);
 				
-				if ( start < 1 + end )
+				if ( start < 1 + end ) {
+					Toast.makeText(getActivity(), String.valueOf(start), Toast.LENGTH_SHORT).show();
 					return true;
-				
+				}
+					
 				// start = end - 1;
 				// should update here
-				
+				Toast.makeText(getActivity(), "Start cannot be greater than end", Toast.LENGTH_SHORT).show();
+
 				return false;
 			}
 		});
@@ -56,13 +52,16 @@ public class SettingsFragment extends PreferenceFragment {
 				Integer end = (Integer) newValue;
 				Integer start = getPreferenceManager().getSharedPreferences().getInt("pref_start", 0);
 				
-				if (  end <= size && end > 1 + start )
+				if (  end <= size && end > 1 + start ){
+					Toast.makeText(getActivity(), String.valueOf(end), Toast.LENGTH_SHORT).show();
 					return true;
+				}
 				
 				// end = end < start+1 ? start + 1 : end; 
 				// end = end > size ? size : end;
 				// should update here
-			
+				Toast.makeText(getActivity(), "End cannot be lower than start", Toast.LENGTH_SHORT).show();
+
 				return false;
 			}
 		});

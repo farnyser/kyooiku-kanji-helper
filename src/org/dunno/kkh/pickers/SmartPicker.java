@@ -2,6 +2,7 @@ package org.dunno.kkh.pickers;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -25,6 +26,7 @@ public class SmartPicker implements PickerInterface {
 	}
 	
 	private final int MAX_AGE = 1;
+	private final long MAX_TIME = 7 * 24 * 60 * 60;
 	private final double C_1HE = 0.65;
 	private final double C_2HE = 1.00 - C_1HE;
 	private final double C_USE = 0.30;
@@ -89,7 +91,7 @@ public class SmartPicker implements PickerInterface {
 	public QuizzCouple pickQuizzCouple(KanjiSet ks, Kanji k) {
 		PickerInterface.QuizzCouple qcs[] = {
 				PickerInterface.QuizzCouple.KANJI_TO_MEANINGS,
-				PickerInterface.QuizzCouple.KANJI_TO_MEANINGS,
+				PickerInterface.QuizzCouple.KANJI_TO_READINGS,
 				PickerInterface.QuizzCouple.MEANINGS_TO_KANJI,
 				PickerInterface.QuizzCouple.READINGS_TO_KANJI };
 		double errorRate[] = {0,0,0,0};
@@ -137,6 +139,7 @@ public class SmartPicker implements PickerInterface {
 		if ( cache.get(kanji) != null && cache.get(kanji).age < MAX_AGE ) 
 			return cache.get(kanji).score;
 		
+		long now = (new Date()).getTime();
 		
 		int sum1HE = 0;
 		int sum1HS = 0;
@@ -159,6 +162,8 @@ public class SmartPicker implements PickerInterface {
 		int fhs = stats.getFirstHandSuccess(kanji);
 		int fhe = stats.getFirstHandError(kanji);
 		int she = stats.getSecondHandError(kanji);
+		long ls = Math.min(Math.abs(now - stats.getLastSuccess(kanji)), MAX_TIME);
+		long le = Math.min(Math.abs(now - stats.getLastError(kanji)), MAX_TIME);
 		int use = fhs + fhe + she;
 		double successRate = fhs > 0 ? 1 : 0;
 	
@@ -181,6 +186,10 @@ public class SmartPicker implements PickerInterface {
 			score = (score + C_SR)/(1+C_SR);
 		}
 
+		// increase/decrease score based on last usage
+		score += (1-score) * (le/MAX_TIME);
+		score -= score * (ls/MAX_TIME);
+		
 		SK sk = new SK();
 		sk.age = 0;
 		sk.kanji = kanji;
