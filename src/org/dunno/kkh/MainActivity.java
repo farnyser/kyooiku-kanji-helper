@@ -23,8 +23,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +35,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 	public static final int SETTINGS_REQUEST = 1;
@@ -45,13 +48,19 @@ public class MainActivity extends Activity {
 	QuizzCouple qc;
 	Stats stats;
 
-	int start, end;
+	int start, end, size;
+	float score;
+	boolean showResumeOnSuccess;
+	boolean showResumeOnFailure;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		SharedPreferences sharedPreferences = PreferenceManager
+		
+		Log.v("MainActivity", "onCreate");
+		
+		final SharedPreferences sharedPreferences = PreferenceManager
 				.getDefaultSharedPreferences(getApplicationContext());
 		
 		if (adapter == null) {
@@ -64,7 +73,8 @@ public class MainActivity extends Activity {
 			ks = FIlter.getRange(fullks, start, end);
 			//picker = new RandomPicker();
 			
-			sharedPreferences.edit().putInt("size", fullks.getAll().size()).commit();
+			size = fullks.getAll().size();
+			sharedPreferences.edit().putInt("size", size).commit();
 			
 			try {
 				stats = new Stats(read("stats.csv"));
@@ -77,12 +87,17 @@ public class MainActivity extends Activity {
 			picker = new SmartPicker(stats);
 		}
 
-		if (start != sharedPreferences.getInt("pref_start",
-				0)
-				|| end != sharedPreferences.getInt(
-						"pref_end", 10)) {
+		if (
+				start != sharedPreferences.getInt("pref_start",0)
+				|| end != sharedPreferences.getInt("pref_end", 10)
+				|| showResumeOnSuccess != sharedPreferences.getBoolean("pref_show_resume_success", false)
+				|| showResumeOnFailure != sharedPreferences.getBoolean("pref_show_resume_failure", false)
+		) {
 			start = sharedPreferences.getInt("pref_start", 0);
 			end = sharedPreferences.getInt("pref_end", 10);
+			score = sharedPreferences.getFloat("score", 0);
+			showResumeOnSuccess = sharedPreferences.getBoolean("pref_show_resume_success", false);
+			showResumeOnFailure = sharedPreferences.getBoolean("pref_show_resume_failure", false);
 			ks = FIlter.getRange(fullks, start, end);
 			newChoice();
 		}
@@ -90,6 +105,9 @@ public class MainActivity extends Activity {
 		if (savedInstanceState == null) {
 			newChoice();
 
+			TextView sc = (TextView) findViewById(R.id.score);
+			sc.setText("Score: " + ((int) Math.floor(score)));
+			
 			final GridView gv = (GridView) findViewById(R.id.gridView);
 			gv.setOnItemClickListener(new OnItemClickListener() {
 				@Override
@@ -99,35 +117,84 @@ public class MainActivity extends Activity {
 					Log.v("click", "item selected: " + choosen);
 
 					if (choosen.equals(answer)) {
+						if ( showResumeOnSuccess )
+							showCard(choosen);
+						
+						score += size/(float)(size-Math.abs(end-start));
 						stats.addSuccess(qc, answer);
 						newChoice();
 					} else {
+						if ( showResumeOnFailure )
+							showCard(choosen);
+						
+						score = 0;
 						stats.addError(qc, answer, choosen);
+						arg1.setBackgroundColor(Color.RED);
 					}
 					
+					final TextView sc = (TextView) findViewById(R.id.score);
+					sc.setText("Score: " + ((int) Math.floor(score)));
+					
+					sharedPreferences.edit().putFloat("score", score).commit();
 					write("stats.csv", stats.toString());
 				}
 			});
 		}
 	}
 
+	private void showCard(Kanji k) {
+		String resume = "";
+		resume += "<big><b>" + k.getCharacter() + "</b></big>";
+		resume += "<br />";
+		resume += k.getOnReading() + " / " + k.getKunReading();
+		resume += "<br />";
+		resume += "(" + k.getMeaning() + ")";
+		Toast.makeText(getApplicationContext(), Html.fromHtml(resume), Toast.LENGTH_SHORT).show();
+	}
+
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
+		
+		Log.v("MainActivity", "onWindowFocusChanged");
+
 		if (hasFocus) {
 			SharedPreferences sharedPreferences = PreferenceManager
 					.getDefaultSharedPreferences(getApplicationContext());
-			if (start != sharedPreferences.getInt(
-					"pref_start", 0)
-					|| end != sharedPreferences.getInt(
-							"pref_end", 10)) {
-				start = sharedPreferences.getInt(
-						"pref_start", 0);
-				end = sharedPreferences.getInt("pref_end",
-						10);
+			if (
+				start != sharedPreferences.getInt("pref_start", 0) 
+				|| end != sharedPreferences.getInt("pref_end", 10)
+				|| showResumeOnSuccess != sharedPreferences.getBoolean("pref_show_resume_success", false)
+				|| showResumeOnFailure != sharedPreferences.getBoolean("pref_show_resume_failure", false)
+			) {
+				start = sharedPreferences.getInt("pref_start", 0);
+				end = sharedPreferences.getInt("pref_end", 10);
+				score = sharedPreferences.getFloat("score", 0);
+				showResumeOnSuccess = sharedPreferences.getBoolean("pref_show_resume_success", false);
+				showResumeOnFailure = sharedPreferences.getBoolean("pref_show_resume_failure", false);
 				ks = FIlter.getRange(fullks, start, end);
 				newChoice();
 			}
+		}
+	}
+	
+	private int getFirstApparance(Kanji k, QuizzCouple qc) {
+		switch (qc) {
+		case KANJI_TO_MEANINGS:
+		case KANJI_TO_READINGS:
+			return android.R.attr.textAppearanceLarge;
+		default:
+			return android.R.attr.textAppearanceMedium;
+		}
+	}
+	
+	private int getSecondApparance(Kanji k, QuizzCouple qc) {
+		switch (qc) {
+		case KANJI_TO_MEANINGS:
+		case KANJI_TO_READINGS:
+			return android.R.attr.textAppearanceSmall;
+		default:
+			return android.R.attr.textAppearanceLarge;
 		}
 	}
 
@@ -140,7 +207,12 @@ public class MainActivity extends Activity {
 		case MEANINGS_TO_KANJI:
 			return k.getMeaning();
 		case READINGS_TO_KANJI:
-			return k.getOnReading() + " / " + k.getKunReading();
+			if ( k.getOnReading().isEmpty() )
+				return k.getKunReading();
+			else if ( k.getKunReading().isEmpty() )
+				return k.getOnReading();
+			else
+				return k.getOnReading() + " / " + k.getKunReading();
 		default:
 			return "";
 		}
@@ -151,7 +223,12 @@ public class MainActivity extends Activity {
 		case KANJI_TO_MEANINGS:
 			return k.getMeaning();
 		case KANJI_TO_READINGS:
-			return k.getOnReading() + " / " + k.getKunReading();
+			if ( k.getOnReading().isEmpty() )
+				return k.getKunReading();
+			else if ( k.getKunReading().isEmpty() )
+				return k.getOnReading();
+			else
+				return k.getOnReading() + "\n" + k.getKunReading();
 		case MEANINGS_TO_KANJI:
 			return k.getCharacter();
 		case READINGS_TO_KANJI:
@@ -170,13 +247,14 @@ public class MainActivity extends Activity {
 
 		// set question
 		tv.setText(getFirst(answer, qc));
+		tv.setTextAppearance(getApplicationContext(), getFirstApparance(answer, qc));
 
 		// set reply
 		ArrayList<String> items = new ArrayList<String>();
 		for (Kanji k : choices.getAll()) {
 			items.add(getSecond(k, qc));
 		}
-		adapter.updateContent(choices.getAll(), items);
+		adapter.updateContent(choices.getAll(), items, getSecondApparance(answer, qc));
 	}
 
 	@Override

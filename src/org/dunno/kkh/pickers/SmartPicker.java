@@ -10,6 +10,8 @@ import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
 import org.dunno.kkh.models.Stats;
 
+import android.util.Log;
+
 public class SmartPicker implements PickerInterface {
 	private Stats stats;
 	private Random random = new Random();
@@ -31,6 +33,7 @@ public class SmartPicker implements PickerInterface {
 	private final double C_2HE = 1.00 - C_1HE;
 	private final double C_USE = 0.30;
 	private final double C_SR = 0.30;
+	private final double C_LS_LE = 0.20;
 	
 	private HashMap<Kanji, SK> cache = new HashMap<Kanji, SK>();
 	
@@ -48,10 +51,11 @@ public class SmartPicker implements PickerInterface {
 		int SIZE = 4;
 		Double SCORE = computeScore(ks, k);
 		
-		if ( SCORE > .8 ) SIZE = 2;
-		else if ( SCORE >.6 ) SIZE = 4;
-		else if ( SCORE >.4 ) SIZE = 6;
-		else if ( SCORE >.2 ) SIZE = 8;
+		if ( SCORE > .75 ) SIZE = 2;
+		else if ( SCORE >.55 ) SIZE = 4;
+		else if ( SCORE >.30 ) SIZE = 6;
+		else if ( SCORE >.10 ) SIZE = 8;
+		else SIZE = 10;
 		 
 		
 		KanjiSet result = new KanjiSet();
@@ -162,15 +166,17 @@ public class SmartPicker implements PickerInterface {
 		int fhs = stats.getFirstHandSuccess(kanji);
 		int fhe = stats.getFirstHandError(kanji);
 		int she = stats.getSecondHandError(kanji);
-		long ls = Math.min(Math.abs(now - stats.getLastSuccess(kanji)), MAX_TIME);
-		long le = Math.min(Math.abs(now - stats.getLastError(kanji)), MAX_TIME);
+		long ls = Math.min(Math.abs(now - stats.getLastSuccess(kanji)), MAX_TIME) / MAX_TIME;
+		long le = Math.min(Math.abs(now - stats.getLastError(kanji)), MAX_TIME) / MAX_TIME;
 		int use = fhs + fhe + she;
 		double successRate = fhs > 0 ? 1 : 0;
+		
 	
 		if ( she != 0 || fhe != 0 )
 			successRate = fhs / (C_1HE*fhe + C_2HE*she); 
 		
 		double score = 1 - successRate;
+		Log.d("score suc/err", kanji + " => " + score);
 		
 		if ( ksSize > 0 ) {
 			double avgUse = sumUse / ksSize;
@@ -178,6 +184,7 @@ public class SmartPicker implements PickerInterface {
 			// increase score if not used often
 			if ( use < avgUse ) {
 				score = (score + C_USE)/(1+C_USE);
+				Log.d("score use", kanji + " => " + score);
 			}
 		}
 		
@@ -185,22 +192,28 @@ public class SmartPicker implements PickerInterface {
 		if ( successRate < avgSuccessRate ) {
 			score = (score + C_SR)/(1+C_SR);
 		}
+		Log.d("score avg", kanji + " => " + score);
 
 		// increase/decrease score based on last usage
-		score += (1-score) * (le/MAX_TIME);
-		score -= score * (ls/MAX_TIME);
-		
-		SK sk = new SK();
-		sk.age = 0;
-		sk.kanji = kanji;
-		sk.score = score;
-		cache.put(kanji, sk);
+		Log.d("le", kanji + " => " + le);
+		Log.d("ls", kanji + " => " + ls);
+		score += C_LS_LE * (1-score) * le;
+		Log.d("score time le", kanji + " => " + score);
+		score -= C_LS_LE * score * ls;
+		Log.d("score time ls", kanji + " => " + score);
 		
 		// reuse kanji, even if we are good
 		// if we don't show them anymore, it can be forgotten
 		if ( score < .01 ) 
 			score = .01;
 		
+		SK sk = new SK();
+		sk.age = 0;
+		sk.kanji = kanji;
+		sk.score = score;
+		cache.put(kanji, sk);
+
+		Log.d("score", kanji + " => " + score);
 		return score;
 	}
 	
