@@ -62,9 +62,8 @@ public class ObjectAdapter extends BaseAdapter {
 			text = (TextView) v;
 		
 		text.setTextAppearance(vg.getContext(), apparance);
-		//text.setBackgroundColor(vg.getContext().getResources().getColor(android.R.color.darker_gray));
-		text.setBackgroundColor(vg.getContext().getResources().getColor(R.color.griditem));
-		text.setHeight(100);
+		text.setBackground(vg.getContext().getResources().getDrawable(R.drawable.light));
+		text.setHeight(120);
 		text.setWidth(100);
 		text.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 

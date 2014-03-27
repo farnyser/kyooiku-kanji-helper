@@ -166,43 +166,46 @@ public class Stats {
 	}
 
 	public String toString() {
-		String result = "";
-
+		StringBuilder result = new StringBuilder();
+		
 		for (StatItem si : stats.values()) {
-			result += si.kanjiNumber + ", ";
+			String s = "";
+			s += si.kanjiNumber + ", ";
 			
-			result += si.lastSuccess + ", ";
-			result += si.lastError + ", ";
+			s += si.lastSuccess + ", ";
+			s += si.lastError + ", ";
 
-			result += si.firstHandSuccess.get(QuizzCouple.KANJI_TO_MEANINGS)
+			s += si.firstHandSuccess.get(QuizzCouple.KANJI_TO_MEANINGS)
 					+ ", ";
-			result += si.firstHandSuccess.get(QuizzCouple.KANJI_TO_READINGS)
+			s += si.firstHandSuccess.get(QuizzCouple.KANJI_TO_READINGS)
 					+ ", ";
-			result += si.firstHandSuccess.get(QuizzCouple.READINGS_TO_KANJI)
+			s += si.firstHandSuccess.get(QuizzCouple.READINGS_TO_KANJI)
 					+ ", ";
-			result += si.firstHandSuccess.get(QuizzCouple.MEANINGS_TO_KANJI)
-					+ ", ";
-
-			result += si.firstHandError.get(QuizzCouple.KANJI_TO_MEANINGS)
-					+ ", ";
-			result += si.firstHandError.get(QuizzCouple.KANJI_TO_READINGS)
-					+ ", ";
-			result += si.firstHandError.get(QuizzCouple.READINGS_TO_KANJI)
-					+ ", ";
-			result += si.firstHandError.get(QuizzCouple.MEANINGS_TO_KANJI)
+			s += si.firstHandSuccess.get(QuizzCouple.MEANINGS_TO_KANJI)
 					+ ", ";
 
-			result += si.secondHandError.get(QuizzCouple.KANJI_TO_MEANINGS)
+			s += si.firstHandError.get(QuizzCouple.KANJI_TO_MEANINGS)
 					+ ", ";
-			result += si.secondHandError.get(QuizzCouple.KANJI_TO_READINGS)
+			s += si.firstHandError.get(QuizzCouple.KANJI_TO_READINGS)
 					+ ", ";
-			result += si.secondHandError.get(QuizzCouple.READINGS_TO_KANJI)
+			s += si.firstHandError.get(QuizzCouple.READINGS_TO_KANJI)
 					+ ", ";
-			result += si.secondHandError.get(QuizzCouple.MEANINGS_TO_KANJI)
+			s += si.firstHandError.get(QuizzCouple.MEANINGS_TO_KANJI)
+					+ ", ";
+
+			s += si.secondHandError.get(QuizzCouple.KANJI_TO_MEANINGS)
+					+ ", ";
+			s += si.secondHandError.get(QuizzCouple.KANJI_TO_READINGS)
+					+ ", ";
+			s += si.secondHandError.get(QuizzCouple.READINGS_TO_KANJI)
+					+ ", ";
+			s += si.secondHandError.get(QuizzCouple.MEANINGS_TO_KANJI)
 					+ " eol\n";
+			
+			result.append(s);
 		}
 
-		return result;
+		return result.toString();
 	}
 
 	public Stats(String csv) {

@@ -49,7 +49,6 @@ public class MainActivity extends Activity {
 	Stats stats;
 
 	int start, end, size;
-	float score;
 	boolean showResumeOnSuccess;
 	boolean showResumeOnFailure;
 
@@ -95,7 +94,6 @@ public class MainActivity extends Activity {
 		) {
 			start = sharedPreferences.getInt("pref_start", 0);
 			end = sharedPreferences.getInt("pref_end", 10);
-			score = sharedPreferences.getFloat("score", 0);
 			showResumeOnSuccess = sharedPreferences.getBoolean("pref_show_resume_success", false);
 			showResumeOnFailure = sharedPreferences.getBoolean("pref_show_resume_failure", false);
 			ks = FIlter.getRange(fullks, start, end);
@@ -104,9 +102,7 @@ public class MainActivity extends Activity {
 
 		if (savedInstanceState == null) {
 			newChoice();
-
-			TextView sc = (TextView) findViewById(R.id.score);
-			sc.setText("Score: " + ((int) Math.floor(score)));
+			setScore(sharedPreferences, 0f);
 			
 			final GridView gv = (GridView) findViewById(R.id.gridView);
 			gv.setOnItemClickListener(new OnItemClickListener() {
@@ -119,27 +115,39 @@ public class MainActivity extends Activity {
 					if (choosen.equals(answer)) {
 						if ( showResumeOnSuccess )
 							showCard(choosen);
-						
-						score += size/(float)(size-Math.abs(end-start));
+
+						incScore(sharedPreferences, size/(float)(size-Math.abs(end-start)));
 						stats.addSuccess(qc, answer);
 						newChoice();
 					} else {
 						if ( showResumeOnFailure )
 							showCard(choosen);
 						
-						score = 0;
+						setScore(sharedPreferences, 0f);
 						stats.addError(qc, answer, choosen);
-						arg1.setBackgroundColor(Color.RED);
+						arg1.setBackground(getResources().getDrawable(R.drawable.error));
 					}
 					
-					final TextView sc = (TextView) findViewById(R.id.score);
-					sc.setText("Score: " + ((int) Math.floor(score)));
-					
-					sharedPreferences.edit().putFloat("score", score).commit();
 					write("stats.csv", stats.toString());
 				}
 			});
 		}
+	}
+	
+	private void incScore(SharedPreferences sharedPreferences, float inc) {
+		setScore(sharedPreferences, sharedPreferences.getFloat("score", 0) + inc);
+	}
+	
+	private void setScore(SharedPreferences sharedPreferences, float score) {
+		if ( score > sharedPreferences.getFloat("best", 0) ) {
+			sharedPreferences.edit().putFloat("best", score).commit();
+		}
+		
+		final TextView sc = (TextView) findViewById(R.id.score);
+		final TextView bc = (TextView) findViewById(R.id.best);
+		sc.setText("Score\n" + ((int) Math.floor(score)));
+		bc.setText("Best\n" + ((int) Math.floor(sharedPreferences.getFloat("best", 0))));
+		sharedPreferences.edit().putFloat("score", score).commit();
 	}
 
 	private void showCard(Kanji k) {
@@ -169,7 +177,6 @@ public class MainActivity extends Activity {
 			) {
 				start = sharedPreferences.getInt("pref_start", 0);
 				end = sharedPreferences.getInt("pref_end", 10);
-				score = sharedPreferences.getFloat("score", 0);
 				showResumeOnSuccess = sharedPreferences.getBoolean("pref_show_resume_success", false);
 				showResumeOnFailure = sharedPreferences.getBoolean("pref_show_resume_failure", false);
 				ks = FIlter.getRange(fullks, start, end);
@@ -239,6 +246,7 @@ public class MainActivity extends Activity {
 	}
 
 	private void newChoice() {
+		Log.d("MainActivity", "newChoice");
 		final TextView tv = (TextView) findViewById(R.id.textView);
 
 		answer = picker.pickKanji(ks);

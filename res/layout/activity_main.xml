@@ -7,16 +7,34 @@
     tools:context=".MainActivity"
     android:background="@color/background" >
     
-    <TextView
-        android:id="@+id/score"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="fill_vertical|fill_horizontal"
-        android:layout_margin="10dp"
-        android:padding="10dp"
-        android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:background="@color/score" />
+    <LinearLayout 
+	        android:layout_margin="10dp"
+	        android:padding="0dp"
+	     	android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:orientation="horizontal" >
+   	    
+   	    <TextView
+        	android:id="@+id/score"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="fill_vertical|fill_horizontal"
+	        android:padding="10dp"
+	        android:gravity="center"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:background="@drawable/round" />
+   	   	    
+   	    <TextView
+        	android:id="@+id/best"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="fill_vertical|fill_horizontal"
+	        android:layout_marginLeft="10dp"
+	        android:padding="10dp"
+	        android:gravity="center"
+	        android:textAppearance="?android:attr/textAppearanceLarge"
+	        android:background="@drawable/round" />
+   	</LinearLayout>
     
     <GridView
         android:id="@+id/gridView"
@@ -28,8 +46,9 @@
         android:padding="10dp"
         android:stretchMode="columnWidth"
         android:verticalSpacing="10dp" 
-        android:layout_margin="10dp"
-        android:background="@color/grid" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/round" />
 
     <TextView
         android:id="@+id/textView"
@@ -41,6 +60,6 @@
         android:layout_marginBottom="20dp"
         android:layout_margin="10dp"
         android:padding="10dp"
-        android:background="@color/query" />
+        android:background="@drawable/round" />
 
 </LinearLayout>
