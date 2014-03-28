@@ -23,11 +23,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -145,19 +145,20 @@ public class MainActivity extends Activity {
 		
 		final TextView sc = (TextView) findViewById(R.id.score);
 		final TextView bc = (TextView) findViewById(R.id.best);
-		sc.setText("Score\n" + ((int) Math.floor(score)));
-		bc.setText("Best\n" + ((int) Math.floor(sharedPreferences.getFloat("best", 0))));
+		sc.setText(Html.fromHtml(("S<small>core</small><br/>" + ((int) Math.floor(score))).toUpperCase()));
+		bc.setText(Html.fromHtml(("B<small>est</small><br/>" + ((int) Math.floor(sharedPreferences.getFloat("best", 0)))).toUpperCase()));
 		sharedPreferences.edit().putFloat("score", score).commit();
 	}
 
 	private void showCard(Kanji k) {
 		String resume = "";
 		resume += "<big><b>" + k.getCharacter() + "</b></big>";
+		resume += " " + k.getMeaning();
 		resume += "<br />";
 		resume += k.getOnReading() + " / " + k.getKunReading();
-		resume += "<br />";
-		resume += "(" + k.getMeaning() + ")";
-		Toast.makeText(getApplicationContext(), Html.fromHtml(resume), Toast.LENGTH_SHORT).show();
+		Toast toast = Toast.makeText(getApplicationContext(), Html.fromHtml(resume), Toast.LENGTH_SHORT);
+		toast.setGravity(Gravity.CENTER, 0, 0);
+		toast.show();
 	}
 
 	@Override
