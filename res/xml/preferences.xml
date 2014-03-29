@@ -17,11 +17,11 @@
 	<CheckBoxPreference
 		android:defaultValue="false"
 	    android:key="pref_show_resume_success"
-	    android:title="Show kanji resume"
-	    android:summary="Display a quick learning card for each correct guess" />
+	    android:title="@string/settings_resume_success"
+	    android:summary="@string/settings_resume_success__s" />
 	<CheckBoxPreference
 		android:defaultValue="false"
 	    android:key="pref_show_resume_failure"
-	    android:title="Show kanji resume on error"
-	    android:summary="Display a quick learning card for each wrong guess" />
+	    android:title="@string/settings_resume_failure"
+	    android:summary="@string/settings_resume_failure__s" />
 </PreferenceScreen>

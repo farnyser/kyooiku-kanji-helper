@@ -8,27 +8,79 @@ import java.util.HashMap;
 import org.dunno.kkh.pickers.PickerInterface.QuizzCouple;
 
 public class Stats {
+	/**
+	 * Represent statistics about a Kanji.
+	 * 
+	 * For example, contains the date of last success 
+	 * (when the Kanji was found correctly for the last time)
+	 */
 	private class StatItem {
-		public Integer kanjiNumber;
+		/**
+		 * Kanji rank in the Kyooiku ranking
+		 */
+		public final Integer kanjiNumber;
+		
+		/**
+		 * Last time when the Kanji was correctly found (as a timestamp)
+		 */
 		public Long lastSuccess;
+		
+		/**
+		 * LAst time when the Kanji was not correctly found (as a timestamp)
+		 */
 		public Long lastError;
+		
+		/**
+		 * Map of QuizzCouple to a count of error. 
+		 * 
+		 * For example, when displaying "Inu"(Japanese kanji), if the user click on "Cat"(Meaning), 
+		 * then this is incremented for the Kanji INU, and QuizzCouple=KANJI_TO_MEANINGS
+		 */
 		public HashMap<QuizzCouple, Integer> firstHandError = new HashMap<QuizzCouple, Integer>();
+
+		/**
+		 * Map of QuizzCouple to a count of error. 
+		 * 
+		 * For example, when displaying "Inu"(Japanese kanji), if the user click on "Cat"(Meaning), 
+		 * then this is incremented for the Kanji CAT, and QuizzCouple=KANJI_TO_MEANINGS
+		 */
 		public HashMap<QuizzCouple, Integer> secondHandError = new HashMap<QuizzCouple, Integer>();
+		
+
+		/**
+		 * Map of QuizzCouple to a count of success. 
+		 * 
+		 * For example, when displaying "Inu"(Japanese kanji), if the user click on "Dog"(Meaning), 
+		 * then this is incremented for the Kanji INU, and QuizzCouple=KANJI_TO_MEANINGS
+		 */
 		public HashMap<QuizzCouple, Integer> firstHandSuccess = new HashMap<QuizzCouple, Integer>();
 
-		public StatItem(int n) {
+		/**
+		 * Construct the stats for the Kanji of rank n
+		 * @param n	Rank
+		 */
+		public StatItem(int n, Date now) {
 			this.kanjiNumber = n;
-			this.lastError = (new Date()).getTime();
+			this.lastError = now.getTime();
 			this.lastSuccess = Long.valueOf(0);
 		}
 	}
 
+	
+	/**
+	 * Map of Kanji-rank to stats
+	 */
 	@SuppressLint("UseSparseArrays")
-	public HashMap<Integer, StatItem> stats = new HashMap<Integer, StatItem>();
+	private HashMap<Integer, StatItem> stats = new HashMap<Integer, StatItem>();
 
-	private void init(int n) {
+	/**
+	 * Add a StatItem for a Kanji of rank n
+	 * @param n	Rank of the kanji
+	 * @param now Date used for initialization
+	 */
+	private void init(int n, Date now) {
 		if (stats.get(n) == null) {
-			stats.put(n, new StatItem(n));
+			stats.put(n, new StatItem(n, now));
 			stats.get(n).firstHandError.put(QuizzCouple.KANJI_TO_MEANINGS, 0);
 			stats.get(n).firstHandError.put(QuizzCouple.KANJI_TO_READINGS, 0);
 			stats.get(n).firstHandError.put(QuizzCouple.READINGS_TO_KANJI, 0);
@@ -46,26 +98,28 @@ public class Stats {
 
 	public void addSuccess(QuizzCouple qc, Kanji answer) {
 		Integer n = answer.getNumber();
-		init(n);
-		stats.get(n).lastSuccess = (new Date()).getTime();
-		stats.get(n).firstHandSuccess.put(qc,
+		Date now = (new Date());
+		init(n, now);
+		stats.get(n).lastSuccess = now.getTime();
+		stats.get(n).firstHandSuccess.put(qc, 
 				stats.get(n).firstHandSuccess.get(qc) + 1);
 	}
 
 	public void addError(QuizzCouple qc, Kanji answer, Kanji choosen) {
 		Integer n = answer.getNumber();
 		Integer c = choosen.getNumber();
-		init(n);
-		init(c);
-		stats.get(n).lastError = (new Date()).getTime();
-		stats.get(c).lastError = (new Date()).getTime();
+		Date now = (new Date());
+		init(n, now);
+		init(c, now);
+		stats.get(n).lastError = now.getTime();
+		stats.get(c).lastError = now.getTime();
 		stats.get(n).firstHandError.put(qc,
 				stats.get(n).firstHandError.get(qc) + 1);
 		stats.get(c).secondHandError.put(qc,
 				stats.get(c).secondHandError.get(qc) + 1);
 	}
 
-	public Long getLastSuccess(Kanji k) {
+	public long getLastSuccess(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
 		if ( si != null )
 			return si.lastSuccess;
@@ -73,7 +127,7 @@ public class Stats {
 			return Long.valueOf(0);
 	}
 	
-	public Long getLastError(Kanji k) {
+	public long getLastError(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
 		if ( si != null )
 			return si.lastError;
@@ -81,23 +135,20 @@ public class Stats {
 			return Long.valueOf(0);
 	}
 	
-	public Integer getFirstHandSuccess(Kanji k) {
+	public int getFirstHandSuccess(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
+		Integer sum = 0;
 		
-		if ( si != null ) {
-			Integer sum = 0;
-			
+		if ( si != null ) {	
 			for ( Integer i : si.firstHandSuccess.values() ) {
 				sum += i;
 			}
-			
-			return sum;
 		}
 		
-		return 0;
+		return sum;
 	}
 	
-	public Integer getFirstHandSuccess(Kanji k, QuizzCouple qc) {
+	public int getFirstHandSuccess(Kanji k, QuizzCouple qc) {
 		StatItem si = stats.get(k.getNumber());
 		
 		if ( si != null ) {			
@@ -109,23 +160,20 @@ public class Stats {
 		return 0;
 	}
 	
-	public Integer getFirstHandError(Kanji k) {
+	public int getFirstHandError(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
+		Integer sum = 0;
 		
 		if ( si != null ) {
-			Integer sum = 0;
-			
 			for ( Integer i : si.firstHandError.values() ) {
 				sum += i;
 			}
-			
-			return sum;
 		}
 		
-		return 0;
+		return sum;
 	}
 	
-	public Integer getFirstHandError(Kanji k, QuizzCouple qc) {
+	public int getFirstHandError(Kanji k, QuizzCouple qc) {
 		StatItem si = stats.get(k.getNumber());
 		
 		if ( si != null ) {			
@@ -137,23 +185,20 @@ public class Stats {
 		return 0;
 	}
 
-	public Integer getSecondHandError(Kanji k) {
+	public int getSecondHandError(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
+		Integer sum = 0;
 		
 		if ( si != null ) {
-			Integer sum = 0;
-			
 			for ( Integer i : si.secondHandError.values() ) {
 				sum += i;
 			}
-			
-			return sum;
 		}
 		
-		return 0;
+		return sum;
 	}
 	
-	public Integer getSecondHandError(Kanji k, QuizzCouple qc) {
+	public int getSecondHandError(Kanji k, QuizzCouple qc) {
 		StatItem si = stats.get(k.getNumber());
 		
 		if ( si != null ) {			
@@ -165,6 +210,9 @@ public class Stats {
 		return 0;
 	}
 
+	/**
+	 * Encode the statistics to a CSV-like format
+	 */
 	public String toString() {
 		StringBuilder result = new StringBuilder();
 		
@@ -208,17 +256,22 @@ public class Stats {
 		return result.toString();
 	}
 
+	/**
+	 * Initialize statistics from a CSV-like format
+	 * @param csv	List of statistics
+	 */
 	public Stats(String csv) {
 		if (csv == null)
 			return;
 
 		final String[] lines = csv.split("eol");
-
+		final Date now = new Date();
+		
 		for (String line : lines) {
 			String items[] = line.replace(" ", "").split(",");
 			Integer n = (Integer.parseInt(items[0]));
 
-			init(n);
+			init(n, now);
 			
 			stats.get(n).lastSuccess = Long.parseLong(items[1]);
 			stats.get(n).lastError = Long.parseLong(items[2]);

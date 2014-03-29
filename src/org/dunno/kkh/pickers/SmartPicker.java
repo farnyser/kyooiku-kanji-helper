@@ -43,7 +43,7 @@ public class SmartPicker implements PickerInterface {
 
 	@Override
 	public Kanji pickKanji(KanjiSet ks) {
-		return pickKanji(ks, null, null);
+		return pickKanji(ks, null, null, false);
 	}
 
 	@Override
@@ -59,6 +59,7 @@ public class SmartPicker implements PickerInterface {
 		 
 		
 		KanjiSet result = new KanjiSet();
+		boolean reverse = SCORE >= .99; 
 		
 		int correctPosition = random.nextInt(SIZE);
 		for ( int i = 0 ; i < SIZE ; i++ ) {
@@ -68,7 +69,7 @@ public class SmartPicker implements PickerInterface {
 			}
 			
 			while ( true ) {
-				Kanji tmp = pickKanji(ks, k, result);
+				Kanji tmp = pickKanji(ks, k, result, reverse);
 				if ( tmp == null )
 					break;
 				else if ( tmp.equals(k) == false && result.getAll().contains(tmp) == false ) { 
@@ -222,9 +223,10 @@ public class SmartPicker implements PickerInterface {
 	 * @param ks			List to choose from
 	 * @param notItem		Kanji to eliminate
 	 * @param notList		List of Kanji to eliminate
+	 * @param reverse		If set to true, pick easiest choices
 	 * @return a kanji, or null
 	 */
-	private Kanji pickKanji(KanjiSet ks, Kanji notItem, KanjiSet notList) {
+	private Kanji pickKanji(KanjiSet ks, Kanji notItem, KanjiSet notList, boolean reverse) {
 		ArrayList<SK> sks = new ArrayList<SK>();
 		Double sumScore = 0.0;
 		
@@ -237,6 +239,8 @@ public class SmartPicker implements PickerInterface {
 			SK sk = new SK();
 			sk.kanji = k;
 			sk.score = computeScore(ks, k);
+			if ( reverse ) 
+				sk.score = 1 - sk.score;
 			sumScore += sk.score;
 			sks.add(sk);
 		}
