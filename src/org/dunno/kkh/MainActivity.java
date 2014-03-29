@@ -206,46 +206,6 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private String getFirst(Kanji k, QuizzCouple qc) {
-		switch (qc) {
-		case KANJI_TO_MEANINGS:
-			return k.getCharacter();
-		case KANJI_TO_READINGS:
-			return k.getCharacter();
-		case MEANINGS_TO_KANJI:
-			return k.getMeaning();
-		case READINGS_TO_KANJI:
-			if ( k.getOnReading().isEmpty() )
-				return k.getKunReading();
-			else if ( k.getKunReading().isEmpty() )
-				return k.getOnReading();
-			else
-				return k.getOnReading() + " / " + k.getKunReading();
-		default:
-			return "";
-		}
-	}
-
-	private String getSecond(Kanji k, QuizzCouple qc) {
-		switch (qc) {
-		case KANJI_TO_MEANINGS:
-			return k.getMeaning();
-		case KANJI_TO_READINGS:
-			if ( k.getOnReading().isEmpty() )
-				return k.getKunReading();
-			else if ( k.getKunReading().isEmpty() )
-				return k.getOnReading();
-			else
-				return k.getOnReading() + "\n" + k.getKunReading();
-		case MEANINGS_TO_KANJI:
-			return k.getCharacter();
-		case READINGS_TO_KANJI:
-			return k.getCharacter();
-		default:
-			return "";
-		}
-	}
-
 	private void newChoice() {
 		Log.d("MainActivity", "newChoice");
 		final TextView tv = (TextView) findViewById(R.id.textView);
@@ -255,13 +215,13 @@ public class MainActivity extends Activity {
 		qc = picker.pickQuizzCouple(ks, answer);
 
 		// set question
-		tv.setText(getFirst(answer, qc));
+		tv.setText(qc.firstAsString(answer));
 		tv.setTextAppearance(getApplicationContext(), getFirstApparance(answer, qc));
 
 		// set reply
 		ArrayList<String> items = new ArrayList<String>();
 		for (Kanji k : choices.getAll()) {
-			items.add(getSecond(k, qc));
+			items.add(qc.secondAsString(k));
 		}
 		adapter.updateContent(choices.getAll(), items, getSecondApparance(answer, qc));
 	}
