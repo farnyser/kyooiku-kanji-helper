@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.Html;
 import android.util.Log;
@@ -36,6 +37,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.Toast;
@@ -54,6 +56,7 @@ public class MainActivity extends Activity {
 	int start, end, size, count;
 	boolean showResumeOnSuccess;
 	boolean showResumeOnFailure;
+	boolean locked;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,7 @@ public class MainActivity extends Activity {
 			Log.v("MainActivity", "create adapter");
 			
 			adapter = new ObjectAdapter();
+			locked = false;
 			
 			((Button) findViewById(R.id.settings)).setOnClickListener(new View.OnClickListener() {
 	             public void onClick(View v) {
@@ -123,25 +127,25 @@ public class MainActivity extends Activity {
 				@Override
 				public void onItemClick(AdapterView<?> arg0, View arg1,
 						int item, long arg3) {
+					if ( locked ) return;
+					
 					Kanji choosen = adapter.getItem(item);
 					Log.v("click", "item selected: " + choosen);
 
 					if (choosen.equals(answer)) {
-						if ( showResumeOnSuccess )
-							showCard(choosen);
-
+						showSuccess(choosen, arg1);
+						
 						int range = Math.abs(end-start);
 						incScore(sharedPreferences, size/(float)(size-range));
 						stats.addSuccess(qc, answer, (range-count)/range);
-						newChoice();
+						locked = true;
 					} else {
-						if ( showResumeOnFailure )
-							showCard(choosen);
+						showError(choosen, arg1);
 						
 						count++;
 						setScore(sharedPreferences, 0f);
 						stats.addError(qc, answer, choosen);
-						arg1.setBackground(getResources().getDrawable(R.drawable.error));
+						locked = false;
 					}
 					
 					write("stats.csv", stats.toString());
@@ -166,6 +170,29 @@ public class MainActivity extends Activity {
 		sharedPreferences.edit().putFloat("score", score).commit();
 	}
 
+	private void showSuccess(Kanji k, final View v) {
+		v.setBackground(getResources().getDrawable(R.drawable.success));
+		
+		new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+            	newChoice();
+            	locked = false;
+            }
+        }, 500);
+        
+		if ( showResumeOnSuccess )
+			showCard(k);
+	}
+	
+	private void showError(Kanji k, final View v) {
+		v.setBackground(getResources().getDrawable(R.drawable.error));
+				
+        
+		if ( showResumeOnFailure )
+			showCard(k);
+	}
+	
 	private void showCard(Kanji k) {
 		String resume = "";
 		resume += "<big><b>" + k.getCharacter() + "</b></big>";

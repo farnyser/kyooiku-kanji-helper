@@ -6,4 +6,6 @@
   <color name="grid">#bbada0</color>
   <color name="griditem">#55330000</color>
   <color name="query">#bbada0</color>
+  <color name="success">#9AED9A</color>
+  <color name="error">#DD9999</color>
 </resources>
