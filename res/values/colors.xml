@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="background">#F8F6ED</color>
-  <color name="score">#bbada0</color>
+  <color name="score">#443333</color>
+  <color name="title">#94897f</color>
   <color name="grid">#bbada0</color>
   <color name="griditem">#55330000</color>
   <color name="query">#bbada0</color>

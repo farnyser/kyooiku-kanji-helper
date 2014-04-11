@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
+import org.dunno.kkh.models.QuizzCouple;
 
 public class RandomPicker implements PickerInterface {
     Random random = new Random();
@@ -38,17 +39,17 @@ public class RandomPicker implements PickerInterface {
 	public QuizzCouple pickQuizzCouple(KanjiSet ks, Kanji k) {
 		switch ( random.nextInt(4) ) {
 			case 0:
-				return PickerInterface.QuizzCouple.KANJI_TO_MEANINGS;
+				return QuizzCouple.KANJI_TO_MEANINGS;
 			case 1:
-				return PickerInterface.QuizzCouple.KANJI_TO_MEANINGS;
+				return QuizzCouple.KANJI_TO_MEANINGS;
 			case 2:
-				return PickerInterface.QuizzCouple.MEANINGS_TO_KANJI;
+				return QuizzCouple.MEANINGS_TO_KANJI;
 			case 3:
-				return PickerInterface.QuizzCouple.READINGS_TO_KANJI;
+				return QuizzCouple.READINGS_TO_KANJI;
 		}
 		
 		// should never get there
-		return PickerInterface.QuizzCouple.READINGS_TO_KANJI;
+		return QuizzCouple.READINGS_TO_KANJI;
 	}
 	
 	

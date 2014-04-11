@@ -7,13 +7,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.dunno.kkh.androtools.ObjectAdapter;
 import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
 import org.dunno.kkh.models.Stats;
+import org.dunno.kkh.models.QuizzCouple;
 import org.dunno.kkh.pickers.PickerInterface;
-import org.dunno.kkh.pickers.PickerInterface.QuizzCouple;
 import org.dunno.kkh.pickers.SmartPicker;
 import org.dunno.kkh.settings.SettingsActivity;
 import org.dunno.kkh.utils.FIlter;
@@ -31,10 +32,12 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -48,14 +51,15 @@ public class MainActivity extends Activity {
 	QuizzCouple qc;
 	Stats stats;
 
-	int start, end, size;
+	int start, end, size, count;
 	boolean showResumeOnSuccess;
 	boolean showResumeOnFailure;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+	    requestWindowFeature(Window.FEATURE_NO_TITLE);
+	    setContentView(R.layout.activity_main);
 		
 		Log.v("MainActivity", "onCreate");
 		
@@ -66,6 +70,16 @@ public class MainActivity extends Activity {
 			Log.v("MainActivity", "create adapter");
 			
 			adapter = new ObjectAdapter();
+			
+			((Button) findViewById(R.id.settings)).setOnClickListener(new View.OnClickListener() {
+	             public void onClick(View v) {
+	     			Intent showSettings = new Intent(MainActivity.this,
+	    					SettingsActivity.class);
+	    			MainActivity.this.startActivityForResult(showSettings,
+	    					SETTINGS_REQUEST);
+	             }
+	         });
+
 			
 			((GridView) findViewById(R.id.gridView)).setAdapter(adapter);
 			fullks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
@@ -116,13 +130,15 @@ public class MainActivity extends Activity {
 						if ( showResumeOnSuccess )
 							showCard(choosen);
 
-						incScore(sharedPreferences, size/(float)(size-Math.abs(end-start)));
-						stats.addSuccess(qc, answer);
+						int range = Math.abs(end-start);
+						incScore(sharedPreferences, size/(float)(size-range));
+						stats.addSuccess(qc, answer, (range-count)/range);
 						newChoice();
 					} else {
 						if ( showResumeOnFailure )
 							showCard(choosen);
 						
+						count++;
 						setScore(sharedPreferences, 0f);
 						stats.addError(qc, answer, choosen);
 						arg1.setBackground(getResources().getDrawable(R.drawable.error));
@@ -145,8 +161,8 @@ public class MainActivity extends Activity {
 		
 		final TextView sc = (TextView) findViewById(R.id.score);
 		final TextView bc = (TextView) findViewById(R.id.best);
-		sc.setText(Html.fromHtml(("S<small>core</small><br/>" + ((int) Math.floor(score))).toUpperCase()));
-		bc.setText(Html.fromHtml(("B<small>est</small><br/>" + ((int) Math.floor(sharedPreferences.getFloat("best", 0)))).toUpperCase()));
+		sc.setText(Html.fromHtml(("S<small>core</small><br/>" + ((int) Math.floor(score))).toUpperCase(Locale.ENGLISH)));
+		bc.setText(Html.fromHtml(("B<small>est</small><br/>" + ((int) Math.floor(sharedPreferences.getFloat("best", 0)))).toUpperCase(Locale.ENGLISH)));
 		sharedPreferences.edit().putFloat("score", score).commit();
 	}
 
@@ -202,14 +218,15 @@ public class MainActivity extends Activity {
 		case KANJI_TO_READINGS:
 			return android.R.attr.textAppearanceSmall;
 		default:
-			return android.R.attr.textAppearanceLarge;
+			return android.R.attr.textAppearanceMedium;
 		}
 	}
 
 	private void newChoice() {
 		Log.d("MainActivity", "newChoice");
 		final TextView tv = (TextView) findViewById(R.id.textView);
-
+		count = 0;
+		
 		answer = picker.pickKanji(ks);
 		choices = picker.pickChoices(ks, answer);
 		qc = picker.pickQuizzCouple(ks, answer);

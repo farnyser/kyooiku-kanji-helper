@@ -7,37 +7,59 @@
     tools:context=".MainActivity"
     android:background="@color/background" >
     
-    <LinearLayout 
-	        android:layout_margin="10dp"
-	        android:padding="0dp"
-	     	android:layout_width="match_parent"
-		    android:layout_height="wrap_content"
-		    android:orientation="horizontal" >
+	<LinearLayout 
+	    android:layout_margin="10dp"
+	    android:padding="0dp"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:weightSum="1"
+	    android:orientation="horizontal"
+        >
    	    
    	    <TextView
         	android:id="@+id/score"
-	        android:layout_width="wrap_content"
+        	android:layout_weight="0.2"
+	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
 	        android:layout_gravity="fill_vertical|fill_horizontal"
 	        android:padding="10dp"
 	        android:gravity="center"
-	        android:background="@drawable/round" />
+	        android:background="@drawable/round"
+	        />
    	   	    
    	    <TextView
         	android:id="@+id/best"
-	        android:layout_width="wrap_content"
+        	android:layout_weight="0.2"
+	        android:layout_width="0dp"
 	        android:layout_height="wrap_content"
 	        android:layout_gravity="fill_vertical|fill_horizontal"
 	        android:layout_marginLeft="10dp"
 	        android:padding="10dp"
 	        android:gravity="center"
-	        android:background="@drawable/round" />
+	        android:background="@drawable/round"
+	        />   	    
+	        
+	  	<Button
+        	android:id="@+id/settings"
+        	android:textStyle="bold"
+        	android:textColor="@color/title"
+        	android:layout_weight="0.6"
+	        android:layout_width="0dp"
+	        android:layout_height="match_parent"
+	        android:layout_gravity="fill_vertical|fill_horizontal"
+	        android:layout_marginLeft="10dp"
+	        android:padding="10dp"
+	        android:gravity="center"
+	        android:text="@string/title"
+	        android:background="@drawable/setting"
+	        />
+	  	
    	</LinearLayout>
     
     <GridView
         android:id="@+id/gridView"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="380dp"
         android:gravity="center"
         android:horizontalSpacing="10dp"
         android:numColumns="auto_fit"
@@ -59,5 +81,7 @@
         android:layout_margin="10dp"
         android:padding="10dp"
         android:background="@drawable/round" />
+    
+    
 
 </LinearLayout>

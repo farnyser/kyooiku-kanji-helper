@@ -8,6 +8,7 @@ import java.util.Random;
 
 import org.dunno.kkh.models.Kanji;
 import org.dunno.kkh.models.KanjiSet;
+import org.dunno.kkh.models.QuizzCouple;
 import org.dunno.kkh.models.Stats;
 
 import android.util.Log;
@@ -94,18 +95,18 @@ public class SmartPicker implements PickerInterface {
 
 	@Override
 	public QuizzCouple pickQuizzCouple(KanjiSet ks, Kanji k) {
-		PickerInterface.QuizzCouple qcs[] = {
-				PickerInterface.QuizzCouple.KANJI_TO_MEANINGS,
-				PickerInterface.QuizzCouple.KANJI_TO_READINGS,
-				PickerInterface.QuizzCouple.MEANINGS_TO_KANJI,
-				PickerInterface.QuizzCouple.READINGS_TO_KANJI };
+		QuizzCouple qcs[] = {
+				QuizzCouple.KANJI_TO_MEANINGS,
+				QuizzCouple.KANJI_TO_READINGS,
+				QuizzCouple.MEANINGS_TO_KANJI,
+				QuizzCouple.READINGS_TO_KANJI };
 		double errorRate[] = {0,0,0,0};
 		double sumErrorRate = 0;
 		
 		for ( int i = 0 ; i < 4 ; i++ ) {
 			QuizzCouple qc = qcs[i];
 			
-			int fhs = stats.getFirstHandSuccess(k, qc);
+			double fhs = stats.getFirstHandSuccess(k, qc);
 			int fhe = stats.getFirstHandError(k, qc);
 			int she = stats.getSecondHandError(k, qc);
 			errorRate[i] = fhs > 0 ? 0 : 1;
@@ -164,12 +165,12 @@ public class SmartPicker implements PickerInterface {
 			 avgSuccessRate = sum1HS / (C_1HE*sum1HE + C_2HE*sum2HE); 
 
 		
-		int fhs = stats.getFirstHandSuccess(kanji);
+		double fhs = stats.getFirstHandSuccess(kanji);
 		int fhe = stats.getFirstHandError(kanji);
 		int she = stats.getSecondHandError(kanji);
 		long ls = Math.min(Math.abs(now - stats.getLastSuccess(kanji)), MAX_TIME) / MAX_TIME;
 		long le = Math.min(Math.abs(now - stats.getLastError(kanji)), MAX_TIME) / MAX_TIME;
-		int use = fhs + fhe + she;
+		double use = fhs + fhe + she;
 		double successRate = fhs > 0 ? 1 : 0;
 		
 	

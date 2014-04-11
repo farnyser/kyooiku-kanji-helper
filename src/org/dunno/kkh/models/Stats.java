@@ -5,7 +5,7 @@ import android.annotation.SuppressLint;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.dunno.kkh.pickers.PickerInterface.QuizzCouple;
+import org.dunno.kkh.models.QuizzCouple;
 
 public class Stats {
 	/**
@@ -53,7 +53,7 @@ public class Stats {
 		 * For example, when displaying "Inu"(Japanese kanji), if the user click on "Dog"(Meaning), 
 		 * then this is incremented for the Kanji INU, and QuizzCouple=KANJI_TO_MEANINGS
 		 */
-		public HashMap<QuizzCouple, Integer> firstHandSuccess = new HashMap<QuizzCouple, Integer>();
+		public HashMap<QuizzCouple, Double> firstHandSuccess = new HashMap<QuizzCouple, Double>();
 
 		/**
 		 * Construct the stats for the Kanji of rank n
@@ -89,20 +89,20 @@ public class Stats {
 			stats.get(n).secondHandError.put(QuizzCouple.KANJI_TO_READINGS, 0);
 			stats.get(n).secondHandError.put(QuizzCouple.READINGS_TO_KANJI, 0);
 			stats.get(n).secondHandError.put(QuizzCouple.MEANINGS_TO_KANJI, 0);
-			stats.get(n).firstHandSuccess.put(QuizzCouple.KANJI_TO_MEANINGS, 0);
-			stats.get(n).firstHandSuccess.put(QuizzCouple.KANJI_TO_READINGS, 0);
-			stats.get(n).firstHandSuccess.put(QuizzCouple.READINGS_TO_KANJI, 0);
-			stats.get(n).firstHandSuccess.put(QuizzCouple.MEANINGS_TO_KANJI, 0);
+			stats.get(n).firstHandSuccess.put(QuizzCouple.KANJI_TO_MEANINGS, 0d);
+			stats.get(n).firstHandSuccess.put(QuizzCouple.KANJI_TO_READINGS, 0d);
+			stats.get(n).firstHandSuccess.put(QuizzCouple.READINGS_TO_KANJI, 0d);
+			stats.get(n).firstHandSuccess.put(QuizzCouple.MEANINGS_TO_KANJI, 0d);
 		}
 	}
 
-	public void addSuccess(QuizzCouple qc, Kanji answer) {
+	public void addSuccess(QuizzCouple qc, Kanji answer, double s) {
 		Integer n = answer.getNumber();
 		Date now = (new Date());
 		init(n, now);
 		stats.get(n).lastSuccess = now.getTime();
 		stats.get(n).firstHandSuccess.put(qc, 
-				stats.get(n).firstHandSuccess.get(qc) + 1);
+				stats.get(n).firstHandSuccess.get(qc) + s);
 	}
 
 	public void addError(QuizzCouple qc, Kanji answer, Kanji choosen) {
@@ -135,12 +135,12 @@ public class Stats {
 			return Long.valueOf(0);
 	}
 	
-	public int getFirstHandSuccess(Kanji k) {
+	public double getFirstHandSuccess(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
-		Integer sum = 0;
+		Double sum = 0d;
 		
 		if ( si != null ) {	
-			for ( Integer i : si.firstHandSuccess.values() ) {
+			for ( Double i : si.firstHandSuccess.values() ) {
 				sum += i;
 			}
 		}
@@ -148,7 +148,7 @@ public class Stats {
 		return sum;
 	}
 	
-	public int getFirstHandSuccess(Kanji k, QuizzCouple qc) {
+	public double getFirstHandSuccess(Kanji k, QuizzCouple qc) {
 		StatItem si = stats.get(k.getNumber());
 		
 		if ( si != null ) {			
@@ -277,13 +277,13 @@ public class Stats {
 			stats.get(n).lastError = Long.parseLong(items[2]);
 
 			stats.get(n).firstHandSuccess.put(QuizzCouple.KANJI_TO_MEANINGS,
-					Integer.parseInt(items[2 + 1]));
+					Double.parseDouble(items[2 + 1]));
 			stats.get(n).firstHandSuccess.put(QuizzCouple.KANJI_TO_READINGS,
-					Integer.parseInt(items[2 + 2]));
+					Double.parseDouble(items[2 + 2]));
 			stats.get(n).firstHandSuccess.put(QuizzCouple.READINGS_TO_KANJI,
-					Integer.parseInt(items[2 + 3]));
+					Double.parseDouble(items[2 + 3]));
 			stats.get(n).firstHandSuccess.put(QuizzCouple.MEANINGS_TO_KANJI,
-					Integer.parseInt(items[2 + 4]));
+					Double.parseDouble(items[2 + 4]));
 
 			stats.get(n).firstHandError.put(QuizzCouple.KANJI_TO_MEANINGS,
 					Integer.parseInt(items[6 + 1]));

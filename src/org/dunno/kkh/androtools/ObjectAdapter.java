@@ -22,15 +22,8 @@ public class ObjectAdapter extends BaseAdapter {
     	this.apparance = apparance;
         this.items.clear();
         this.kanjis.clear();
-    
-        for ( String s : items ) {
-        	this.items.add(s);
-        }
-    
-        for ( Kanji k : kanjis ) {
-        	this.kanjis.add(k);
-        }
-    
+        this.items.addAll(items);
+        this.kanjis.addAll(kanjis);
         this.notifyDataSetChanged();
     }
 
@@ -56,6 +49,9 @@ public class ObjectAdapter extends BaseAdapter {
 		
 		if ( !(v instanceof TextView) ) {
 			text = new TextView(vg.getContext());
+			text.setMinHeight(100);
+			text.setWidth(100);
+			text.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			defaultSize = text.getTextSize();
 		}
 		else
@@ -63,12 +59,9 @@ public class ObjectAdapter extends BaseAdapter {
 		
 		text.setTextAppearance(vg.getContext(), apparance);
 		text.setBackground(vg.getContext().getResources().getDrawable(R.drawable.light));
-		text.setHeight(120);
-		text.setWidth(100);
-		text.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 
-		if ( apparance == android.R.attr.textAppearanceLarge ) {
-			text.setTextSize( (float) (defaultSize * 1.5) );
+		if ( apparance == android.R.attr.textAppearanceMedium ) {
+			text.setTextSize( (float) (defaultSize * 1.8) );
 		}
 		else {
 			text.setTextSize( defaultSize );
