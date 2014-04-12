@@ -61,8 +61,8 @@ public class Stats {
 		 */
 		public StatItem(int n, Date now) {
 			this.kanjiNumber = n;
-			this.lastError = now.getTime();
-			this.lastSuccess = Long.valueOf(0);
+			this.lastError = -1l;
+			this.lastSuccess = -1l;
 		}
 	}
 
@@ -99,7 +99,11 @@ public class Stats {
 	public void addSuccess(QuizzCouple qc, Kanji answer, double s) {
 		Integer n = answer.getNumber();
 		Date now = (new Date());
+		
 		init(n, now);
+		if(stats.get(n).lastError < 0)
+			stats.get(n).lastError = 0l;
+		
 		stats.get(n).lastSuccess = now.getTime();
 		stats.get(n).firstHandSuccess.put(qc, 
 				stats.get(n).firstHandSuccess.get(qc) + s);
@@ -109,8 +113,14 @@ public class Stats {
 		Integer n = answer.getNumber();
 		Integer c = choosen.getNumber();
 		Date now = (new Date());
+		
 		init(n, now);
 		init(c, now);
+		if(stats.get(n).lastSuccess < 0)
+			stats.get(n).lastSuccess = 0l;
+		if(stats.get(c).lastSuccess < 0)
+			stats.get(c).lastSuccess = 0l;
+
 		stats.get(n).lastError = now.getTime();
 		stats.get(c).lastError = now.getTime();
 		stats.get(n).firstHandError.put(qc,
@@ -121,7 +131,7 @@ public class Stats {
 
 	public long getLastSuccess(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
-		if ( si != null )
+		if ( si != null && si.lastSuccess >= 0 )
 			return si.lastSuccess;
 		else
 			return Long.valueOf(0);
@@ -129,10 +139,10 @@ public class Stats {
 	
 	public long getLastError(Kanji k) {
 		StatItem si = stats.get(k.getNumber());
-		if ( si != null )
+		if ( si != null && si.lastError >= 0 )
 			return si.lastError;
 		else
-			return Long.valueOf(0);
+			return new Date().getTime();
 	}
 	
 	public double getFirstHandSuccess(Kanji k) {
@@ -268,7 +278,8 @@ public class Stats {
 		final Date now = new Date();
 		
 		for (String line : lines) {
-			String items[] = line.replace(" ", "").split(",");
+			String items[] = line.replace(" ", "").replace("\n", "").split(",");
+			if ( items.length == 0 || items[0].isEmpty() ) continue;
 			Integer n = (Integer.parseInt(items[0]));
 
 			init(n, now);

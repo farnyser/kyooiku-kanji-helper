@@ -24,11 +24,19 @@ public enum QuizzElement {
 	 * @return String representation
 	 */
 	String toString(Kanji k) {
-		if ( this == KANJI )
-			return k.getCharacter();
-		else if ( this == READINGS )
-			return k.getKunReading() + "\n" + k.getOnReading();
-		else
-			return k.getMeaning();
+		switch ( this ) {
+			case KANJI:
+				return k.getCharacter();
+			case READINGS: {
+				if ( k.getKunReading().isEmpty() ) 
+					return k.getOnReading();
+				else if ( k.getOnReading().isEmpty() )
+					return k.getKunReading();
+				else
+					return k.getKunReading() + "\n" + k.getOnReading();
+			}
+			default:
+				return k.getMeaning();
+		}
 	}
 }

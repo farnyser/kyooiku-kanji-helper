@@ -6,6 +6,7 @@ import java.util.Vector;
 import org.dunno.kkh.R;
 import org.dunno.kkh.models.Kanji;
 
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ public class ObjectAdapter extends BaseAdapter {
 	private int apparance;
 	private float defaultSize;
 	
+	private int minHeight = 0;
+	private int remaining = 0;
+	
     public void updateContent(Collection<Kanji> kanjis, Collection<String> items, int apparance) {
     	this.apparance = apparance;
         this.items.clear();
@@ -25,6 +29,8 @@ public class ObjectAdapter extends BaseAdapter {
         this.items.addAll(items);
         this.kanjis.addAll(kanjis);
         this.notifyDataSetChanged();
+        this.minHeight = 100;
+        this.remaining = items.size();
     }
 
 	
@@ -48,8 +54,20 @@ public class ObjectAdapter extends BaseAdapter {
 		TextView text;
 		
 		if ( !(v instanceof TextView) ) {
-			text = new TextView(vg.getContext());
-			text.setMinHeight(100);
+			text = new TextView(vg.getContext()) {
+				@Override
+				protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+					super.onSizeChanged(w, h, oldw, oldh);
+					remaining--;
+					if ( minHeight < h ) {
+						minHeight = h;
+					}
+					if ( remaining == 0 && minHeight != 100 ) {
+						Log.d("minHeight", "" + h);
+						notifyDataSetChanged();
+					}
+				}
+			};
 			text.setWidth(100);
 			text.setGravity(Gravity.CENTER_VERTICAL | Gravity.CENTER_HORIZONTAL);
 			defaultSize = text.getTextSize();
@@ -57,6 +75,7 @@ public class ObjectAdapter extends BaseAdapter {
 		else
 			text = (TextView) v;
 		
+		text.setMinHeight(minHeight);
 		text.setTextAppearance(vg.getContext(), apparance);
 		text.setBackground(vg.getContext().getResources().getDrawable(R.drawable.light));
 
