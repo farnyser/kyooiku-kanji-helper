@@ -167,8 +167,8 @@ public class MainActivity extends Activity {
 		
 		final TextView sc = (TextView) findViewById(R.id.score);
 		final TextView bc = (TextView) findViewById(R.id.best);
-		sc.setText(toSmallCapital(getResources().getString(R.string.box_score) + "<br/>" + ((int) Math.floor(score))));
-		bc.setText(toSmallCapital(getResources().getString(R.string.box_best) + "<br/>" + ((int) Math.floor(sharedPreferences.getFloat("best", 0)))));
+		sc.setText(toSmallCapital(getResources().getString(R.string.box_score) + "\n" + ((int) Math.floor(score))));
+		bc.setText(toSmallCapital(getResources().getString(R.string.box_best) + "\n" + ((int) Math.floor(sharedPreferences.getFloat("best", 0)))));
 		sharedPreferences.edit().putFloat("score", score).commit();
 	}
 
@@ -294,8 +294,8 @@ public class MainActivity extends Activity {
 	
 	private Spanned toSmallCapital(String str) {
 		str = str.toUpperCase(Locale.ENGLISH);
-		if ( !str.isEmpty() ) 
-			str = str.substring(0, 1) + "<small>" + str.substring(1) + "</small>"; 
+		str = str.replaceAll("([A-Z0-9])([A-Z0-9]*)", "$1<small>$2</small>");
+		str = str.replaceAll("\n", "<br />");
 		return Html.fromHtml(str);
 	}
 
