@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.text.Spanned;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -82,8 +83,9 @@ public class MainActivity extends Activity {
 	    			MainActivity.this.startActivityForResult(showSettings,
 	    					SETTINGS_REQUEST);
 	             }
-	         });
-
+	         });			
+			((Button) findViewById(R.id.settings)).setText(toSmallCapital(getResources().getString(R.string.title)));
+			
 			
 			((GridView) findViewById(R.id.gridView)).setAdapter(adapter);
 			fullks = ReadCSV.getKanjiSet(getApplicationContext(), R.raw.kanji);
@@ -91,7 +93,7 @@ public class MainActivity extends Activity {
 			//picker = new RandomPicker();
 			
 			size = fullks.getAll().size();
-			sharedPreferences.edit().putInt("size", size).commit();
+			sharedPreferences.edit().putInt(SettingsActivity.SIZE, size).commit();
 			
 			try {
 				stats = new Stats(read("stats.csv"));
@@ -105,15 +107,15 @@ public class MainActivity extends Activity {
 		}
 
 		if (
-				start != sharedPreferences.getInt("pref_start",0)
-				|| end != sharedPreferences.getInt("pref_end", 10)
-				|| showResumeOnSuccess != sharedPreferences.getBoolean("pref_show_resume_success", false)
-				|| showResumeOnFailure != sharedPreferences.getBoolean("pref_show_resume_failure", false)
+				start != sharedPreferences.getInt(SettingsActivity.START,0)
+				|| end != sharedPreferences.getInt(SettingsActivity.END, 10)
+				|| showResumeOnSuccess != sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_SUCCESS, false)
+				|| showResumeOnFailure != sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_FAILURE, false)
 		) {
-			start = sharedPreferences.getInt("pref_start", 0);
-			end = sharedPreferences.getInt("pref_end", 10);
-			showResumeOnSuccess = sharedPreferences.getBoolean("pref_show_resume_success", false);
-			showResumeOnFailure = sharedPreferences.getBoolean("pref_show_resume_failure", false);
+			start = sharedPreferences.getInt(SettingsActivity.START, 0);
+			end = sharedPreferences.getInt(SettingsActivity.END, 10);
+			showResumeOnSuccess = sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_SUCCESS, false);
+			showResumeOnFailure = sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_FAILURE, false);
 			ks = FIlter.getRange(fullks, start, end);
 			newChoice();
 		}
@@ -155,18 +157,18 @@ public class MainActivity extends Activity {
 	}
 	
 	private void incScore(SharedPreferences sharedPreferences, float inc) {
-		setScore(sharedPreferences, sharedPreferences.getFloat("score", 0) + inc);
+		setScore(sharedPreferences, sharedPreferences.getFloat(SettingsActivity.SCORE, 0) + inc);
 	}
 	
 	private void setScore(SharedPreferences sharedPreferences, float score) {
-		if ( score > sharedPreferences.getFloat("best", 0) ) {
-			sharedPreferences.edit().putFloat("best", score).commit();
+		if ( score > sharedPreferences.getFloat(SettingsActivity.BEST, 0) ) {
+			sharedPreferences.edit().putFloat(SettingsActivity.BEST, score).commit();
 		}
 		
 		final TextView sc = (TextView) findViewById(R.id.score);
 		final TextView bc = (TextView) findViewById(R.id.best);
-		sc.setText(Html.fromHtml(("S<small>core</small><br/>" + ((int) Math.floor(score))).toUpperCase(Locale.ENGLISH)));
-		bc.setText(Html.fromHtml(("B<small>est</small><br/>" + ((int) Math.floor(sharedPreferences.getFloat("best", 0)))).toUpperCase(Locale.ENGLISH)));
+		sc.setText(toSmallCapital(getResources().getString(R.string.box_score) + "<br/>" + ((int) Math.floor(score))));
+		bc.setText(toSmallCapital(getResources().getString(R.string.box_best) + "<br/>" + ((int) Math.floor(sharedPreferences.getFloat("best", 0)))));
 		sharedPreferences.edit().putFloat("score", score).commit();
 	}
 
@@ -214,15 +216,15 @@ public class MainActivity extends Activity {
 			SharedPreferences sharedPreferences = PreferenceManager
 					.getDefaultSharedPreferences(getApplicationContext());
 			if (
-				start != sharedPreferences.getInt("pref_start", 0) 
-				|| end != sharedPreferences.getInt("pref_end", 10)
-				|| showResumeOnSuccess != sharedPreferences.getBoolean("pref_show_resume_success", false)
-				|| showResumeOnFailure != sharedPreferences.getBoolean("pref_show_resume_failure", false)
+				start != sharedPreferences.getInt(SettingsActivity.START, 0) 
+				|| end != sharedPreferences.getInt(SettingsActivity.END, 10)
+				|| showResumeOnSuccess != sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_SUCCESS, false)
+				|| showResumeOnFailure != sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_FAILURE, false)
 			) {
-				start = sharedPreferences.getInt("pref_start", 0);
-				end = sharedPreferences.getInt("pref_end", 10);
-				showResumeOnSuccess = sharedPreferences.getBoolean("pref_show_resume_success", false);
-				showResumeOnFailure = sharedPreferences.getBoolean("pref_show_resume_failure", false);
+				start = sharedPreferences.getInt(SettingsActivity.START, 0);
+				end = sharedPreferences.getInt(SettingsActivity.END, 10);
+				showResumeOnSuccess = sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_SUCCESS, false);
+				showResumeOnFailure = sharedPreferences.getBoolean(SettingsActivity.SHOW_RESUME_FAILURE, false);
 				ks = FIlter.getRange(fullks, start, end);
 				newChoice();
 			}
@@ -272,7 +274,6 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
@@ -289,6 +290,13 @@ public class MainActivity extends Activity {
 		}
 
 		return false;
+	}
+	
+	private Spanned toSmallCapital(String str) {
+		str = str.toUpperCase(Locale.ENGLISH);
+		if ( !str.isEmpty() ) 
+			str = str.substring(0, 1) + "<small>" + str.substring(1) + "</small>"; 
+		return Html.fromHtml(str);
 	}
 
 	/**

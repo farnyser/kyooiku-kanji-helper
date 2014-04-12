@@ -5,15 +5,15 @@
 		android:max="1000"
 		android:id="@+id/pref_start"
 		android:key="pref_start"
-		android:title="Start Kanji's number"
-		android:summary="Index of the list's first Kanji" />
+		android:title="@string/settings_start_index"
+		android:summary="@string/settings_start_index__s" />
 	<SeekBarPreference
 		android:defaultValue="10"
 		android:max="1000"
 		android:id="@+id/pref_end"
 	    android:key="pref_end"
-	    android:title="End Kanji's number"
-	    android:summary="Index of the list's last Kanji" />
+	    android:title="@string/settings_end_index"
+	    android:summary="@string/settings_end_index__s" />
 	<CheckBoxPreference
 		android:defaultValue="false"
 	    android:key="pref_show_resume_success"

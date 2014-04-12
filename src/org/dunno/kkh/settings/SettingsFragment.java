@@ -22,16 +22,16 @@ public class SettingsFragment extends PreferenceFragment {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 	
-		final int size = getPreferenceManager().getSharedPreferences().getInt("size", 0);
+		final int size = getPreferenceManager().getSharedPreferences().getInt(SettingsActivity.SIZE, 0);
 		
 		//((SeekBarPreference)getPreferenceScreen().findPreference("pref_start")).setMax(size);
 		//((SeekBarPreference)getPreferenceScreen().findPreference("pref_end")).setMax(size);
 		
-		getPreferenceScreen().findPreference("pref_start").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+		getPreferenceScreen().findPreference(SettingsActivity.START).setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				Integer start = (Integer) newValue;
-				Integer end = getPreferenceManager().getSharedPreferences().getInt("pref_end", start);
+				Integer end = getPreferenceManager().getSharedPreferences().getInt(SettingsActivity.END, start);
 				
 				if ( start < 1 + end ) {
 					Toast.makeText(getActivity(), String.valueOf(start), Toast.LENGTH_SHORT).show();
@@ -46,11 +46,11 @@ public class SettingsFragment extends PreferenceFragment {
 			}
 		});
 		
-		getPreferenceScreen().findPreference("pref_end").setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+		getPreferenceScreen().findPreference(SettingsActivity.END).setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference preference, Object newValue) {
 				Integer end = (Integer) newValue;
-				Integer start = getPreferenceManager().getSharedPreferences().getInt("pref_start", 0);
+				Integer start = getPreferenceManager().getSharedPreferences().getInt(SettingsActivity.START, 0);
 				
 				if (  end <= size && end > 1 + start ){
 					Toast.makeText(getActivity(), String.valueOf(end), Toast.LENGTH_SHORT).show();

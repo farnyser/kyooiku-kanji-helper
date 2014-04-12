@@ -3,10 +3,16 @@
 
     <string name="app_name">Kyooiku Kanji Helper</string>
     <string name="title">Kyooiku K.H.</string>
+    <string name="box_score">Score</string>
+    <string name="box_best">Best</string>
     <string name="menu_settings">Settings</string>
     <string name="settings_resume_failure">Show kanji info on error</string>
     <string name="settings_resume_failure__s">Display a quick learning card for each wrong guess</string>
     <string name="settings_resume_success">Show kanji info on success</string>
     <string name="settings_resume_success__s">Display a quick learning card for each correct guess</string>
+    <string name="settings_start_index">Start Kanji\'s number</string>
+    <string name="settings_start_index__s">Index of the list\'s first Kanji</string>
+    <string name="settings_end_index">End Kanji\'s number</string>
+    <string name="settings_end_index__s">Index of the list\'s last Kanji</string>
     
 </resources>

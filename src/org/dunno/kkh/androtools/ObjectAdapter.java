@@ -6,7 +6,6 @@ import java.util.Vector;
 import org.dunno.kkh.R;
 import org.dunno.kkh.models.Kanji;
 
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +27,9 @@ public class ObjectAdapter extends BaseAdapter {
         this.kanjis.clear();
         this.items.addAll(items);
         this.kanjis.addAll(kanjis);
-        this.notifyDataSetChanged();
         this.minHeight = 100;
         this.remaining = items.size();
+        this.notifyDataSetChanged();
     }
 
 	
@@ -63,7 +62,6 @@ public class ObjectAdapter extends BaseAdapter {
 						minHeight = h;
 					}
 					if ( remaining == 0 && minHeight != 100 ) {
-						Log.d("minHeight", "" + h);
 						notifyDataSetChanged();
 					}
 				}
